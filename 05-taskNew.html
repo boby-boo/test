@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 05</title>
+    <style>
+    body {
+        font-size: 30px;
+        letter-spacing: 5px;
+        color: #f5f5f5;
+        text-transform: uppercase;
+        text-align: center;
+        background-color: #292E31;
+    }
+    .timer {
+        position: absolute;
+        bottom: 40px;
+        right: 20px;
+        padding: 10px;
+        height: 100px;
+
+        text-align: center;
+        line-height: 30px;
+
+        border-radius: 20px;
+        /* background-color: #be3144; */
+        background-color: #353f5b;
+    }
+    .inner {
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+    .top_inner {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10vh;
+ 
+
+        font-size: 30px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+    .counter {
+        width: 200px;
+        height: 120px;
+        padding: 5px;
+        font-size: 20px;
+        background-color: #2f4f4f;
+        border-radius: 10px;
+    }
+    .counter p {
+        font-size: 30px;
+    }
+    .output {
+        width: 1000px;
+        margin: 0 100px 5vh;
+        text-align: left;
+    }
+    .output p {
+        line-height: 1.5;
+    }
+    .output span {
+        font-weight: 800;
+        color: #be3144;
+    }
+    .counter_attempt {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+
+        width: 200px;
+        padding: 5px;
+        height: 20px;
+        font-size: 20px;
+
+        text-align: center;
+        border-radius: 10px;
+    }
+    .counter_attempt p {
+        font-size: 20px;
+    }
+    .client_field {
+        position: sticky;
+        bottom: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    input, button {
+        padding: 10px 5px;
+        font-size: 30px;
+        color: #f5f5f5;
+        letter-spacing: 2px;
+
+        outline: none;
+        background-color: #2f4f4fad;
+    }
+
+    .button {
+        display: inline-block;
+        cursor: pointer;
+        border: 1px solid #2f4f4f;
+        transition: all .3s ease;
+    }
+    .button:hover {
+        background-color: #2f4f4f;
+    }
+</style>
+</head>
+
+<div class="inner">
+
+    <div class="top_inner">
+        <div class="output"><span>Сценарий:</span> я загадал случайное значение от 0 до 100</div>
+        
+        <div class="client_field">
+            <input type="text" class="input" maxlength="3">
+            <button class="button">Спробувати</button>
+        </div>
+
+    </div>
+
+</div>
+
+<body>
+    <script>
+        const input = document.querySelector('.input');
+        const button = document.querySelector('.button');
+
+        
+
+        button.addEventListener('click', (e) => {
+            newGame.game(+input.value);
+
+        })
+
+        document.addEventListener('keydown', (event) => {
+            if (event.code == 'Enter') {
+                newGame.game(+input.value);
+            }
+
+        })
+
+        /*
+        Задание:
+        Напишите сценарии "Игра 'Угадай число'". Суть игры - угадать за меньшее количество попыток число, которое загадал сценарий.
+        Каждый раз, когда игрок пытается угадать число, сценарий выводит подсказку - меньшее или большее число было загадано сценарием.
+        Сценарий загадывает число только один раз в начале игры и это число не меняется до завершения игры.
+        При завершении игры выведите пользователю информацию о том, с какой попытки угадано значение и сколько было потрачено на это времени.
+
+        Для генерации случайного числа используйте следующий код:
+        let randomValue = Math.floor(Math.random() * 101); // случайное значение от 0 до 100 будет записано в переменную randomValue
+        
+        Пример игры:
+        Сценарий: я загадал случайное значение от 0 до 100
+        Пользователь: 50
+        Сценарий: я загадал значение больше, чем 50
+        Пользователь: 75
+        Сценарий: я загадал значение меньше, чем 75
+        Пользователь: 62
+        Сценарий: я загадал значение меньше, чем 62
+        Пользователь: 56
+        Сценарий: Правильно! Загаданное значение 56. Вы угадали с 4й попытки за 10 сек.
+        */
+
+        input.focus();
+
+        class Game {
+        
+            output = document.querySelector('.output');
+            randomValue = Math.floor(Math.random() * 101);
+
+            counterValue = document.querySelector('.counter')
+            counter = 0;
+
+            // counterOfAttempt = document.querySelector('.counter_attempt');
+            // timer = document.querySelector('.timer');
+            idInterval = undefined;
+            minute = 0;
+            sec = 0;
+    
+            game(value) {
+ 
+                console.log(this.randomValue)
+                input.value = '';
+
+                if (value == '' || !value) {
+                    this.createNewElement(this.output,`<span>Сценарий:</span> Нужно ввести число`);
+                }
+                else {
+                    this.counter++;
+                    this.createNewElement(this.output, `<span style="color: #353f5b";>Пользователь:</span> ${value}`);
+
+                    if (!this.idInterval) {
+                        this.getTimer()
+                    }                 
+                    this.checkValue(value);
+                }
+            }
+
+            createNewElement(element, text) {
+                let paragraph = document.createElement('p');
+                paragraph.innerHTML = text;
+                element.append(paragraph);
+            }
+
+            checkValue(value) {
+     
+                if (value < this.randomValue) {
+                    this.createNewElement(this.output, `<span>Сценарий:</span> я загадал значение больше, чем ${value}`);
+                    this.changeBackground('#be3144');
+                }
+
+                if (value > this.randomValue) {
+                    this.createNewElement(this.output, `<span>Сценарий:</span> я загадал значение меньше, чем ${value}`)
+                    this.changeBackground('#be3144');
+                }
+
+                if (value == this.randomValue) {
+                    this.createNewElement(this.output, `<span>Сценарий:</span> Правильно! Загаданное значение <b>${value}</b>. Вы угадали с ${this.counter} попытки, за ${this.timer} сек`);
+                    this.changeBackground('#2f4f4f');
+                    clearInterval(this.idInterval);
+                }
+            }
+          
+            changeBackground(color) {
+                document.querySelector('body').style.background = color;
+                setTimeout(() => {
+                    document.querySelector('body').style.background = '#292E31';
+                }, 100)
+            }
+
+            getTimer() {
+                this.idInterval = setInterval(() => {
+                    this.sec++;
+                    this.timer =`${this.minute}:${this.sec}`;
+                    if (this.sec == 60) {
+                        this.minute++;
+                        this.sec = 0;
+                    }
+                }, 1000);
+            }
+
+        }
+
+        const newGame = new Game ();
+
+    </script>
+</body>
+
+</html>
